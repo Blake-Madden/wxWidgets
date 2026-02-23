@@ -51,6 +51,9 @@ public:
     virtual void Stop() override;
 
     virtual void Print() override;
+#if wxUSE_PRINTING_ARCHITECTURE
+    virtual void Print(const wxPrintData& printData, bool showHeaderFooter = false) override;
+#endif
 
     virtual void LoadURL(const wxString& url) override;
     virtual wxString GetCurrentURL() const override;

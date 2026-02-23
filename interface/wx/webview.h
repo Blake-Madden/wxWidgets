@@ -1258,6 +1258,34 @@ public:
     virtual void Print() = 0;
 
     /**
+        Prints the currently displayed page using the given print settings.
+
+        The @a printData parameter allows specifying paper size, orientation,
+        number of copies, duplex mode and colour/greyscale output. If
+        @a showHeaderFooter is @true, the backend's default header and footer
+        will be printed (the exact content depends on the backend).
+
+        This overload is only available when @c wxUSE_PRINTING_ARCHITECTURE is
+        set to 1. Backends that do not support programmatic print settings
+        will fall back to the parameterless Print().
+
+        Currently the Edge backend (MSW) has full support for all wxPrintData
+        settings including header/footer. The GTK and macOS backends support
+        paper size and orientation but ignore the @a showHeaderFooter parameter.
+        The IE and Chromium backends fall back to Print().
+
+        @param printData
+            The print settings to use.
+        @param showHeaderFooter
+            If @true, display the backend's default header and footer on
+            printed pages. Only supported by the Edge backend.
+
+        @since 3.3.2
+    */
+    virtual void Print(const wxPrintData& printData,
+                       bool showHeaderFooter = false);
+
+    /**
         Registers a custom scheme handler.
         @param handler A shared pointer to a wxWebHandler.
         @note On macOS in order to use handlers two-step creation has to be

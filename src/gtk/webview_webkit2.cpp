@@ -1418,6 +1418,66 @@ void wxWebViewWebKit::Print()
     g_object_unref(printop);
 }
 
+#if wxUSE_PRINTING_ARCHITECTURE
+#include "wx/cmndata.h"
+#include "wx/paper.h"
+
+void wxWebViewWebKit::Print(const wxPrintData& printData, bool WXUNUSED(showHeaderFooter))
+{
+    WebKitPrintOperation* printop = webkit_print_operation_new(m_web_view);
+    GtkPrintSettings* settings = gtk_print_settings_new();
+
+    // Set orientation
+    gtk_print_settings_set_orientation(settings,
+        printData.GetOrientation() == wxLANDSCAPE
+            ? GTK_PAGE_ORIENTATION_LANDSCAPE
+            : GTK_PAGE_ORIENTATION_PORTRAIT);
+
+    // Set paper size (convert from tenths of mm to mm)
+    wxSize paperSizeTenthsMM = wxThePrintPaperDatabase->GetSize(printData.GetPaperId());
+    if (paperSizeTenthsMM.x > 0 && paperSizeTenthsMM.y > 0)
+    {
+        double widthMM = paperSizeTenthsMM.x / 10.0;
+        double heightMM = paperSizeTenthsMM.y / 10.0;
+        GtkPaperSize* paperSize = gtk_paper_size_new_custom(
+            "custom", "Custom", widthMM, heightMM, GTK_UNIT_MM);
+        gtk_print_settings_set_paper_size(settings, paperSize);
+        gtk_paper_size_free(paperSize);
+    }
+
+    // Set copies
+    int copies = printData.GetNoCopies();
+    if (copies > 0)
+        gtk_print_settings_set_n_copies(settings, copies);
+
+    // Set collation
+    gtk_print_settings_set_collate(settings, printData.GetCollate());
+
+    // Set duplex
+    switch (printData.GetDuplex())
+    {
+        case wxDUPLEX_SIMPLEX:
+            gtk_print_settings_set_duplex(settings, GTK_PRINT_DUPLEX_SIMPLEX);
+            break;
+        case wxDUPLEX_HORIZONTAL:
+            gtk_print_settings_set_duplex(settings, GTK_PRINT_DUPLEX_HORIZONTAL);
+            break;
+        case wxDUPLEX_VERTICAL:
+            gtk_print_settings_set_duplex(settings, GTK_PRINT_DUPLEX_VERTICAL);
+            break;
+    }
+
+    // Set color mode
+    gtk_print_settings_set_use_color(settings, printData.GetColour());
+
+    webkit_print_operation_set_print_settings(printop, settings);
+    webkit_print_operation_run_dialog(printop, nullptr);
+
+    g_object_unref(settings);
+    g_object_unref(printop);
+}
+#endif // wxUSE_PRINTING_ARCHITECTURE
+
 
 bool wxWebViewWebKit::IsBusy() const
 {
