@@ -90,6 +90,9 @@ public:
     virtual bool CanSetZoomType(wxWebViewZoomType type) const override;
 
     virtual void Print() override;
+#if wxUSE_PRINTING_ARCHITECTURE
+    virtual void Print(const wxPrintData& printData, bool showHeaderFooter = false) override;
+#endif
 
     virtual wxWebViewZoom GetZoom() const override;
     virtual void SetZoom(wxWebViewZoom zoom) override;
