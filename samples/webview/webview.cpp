@@ -1733,17 +1733,20 @@ void WebFrame::OnPrintWithSettings(wxCommandEvent& WXUNUSED(evt))
         case 5: printData.SetPaperId(wxPAPER_LEGAL);  printData.SetOrientation(wxLANDSCAPE); break;
     }
 
+    wxLogMessage("Printing with paper=%s, orientation=%s",
+        paperChoices[sel],
+        printData.GetOrientation() == wxLANDSCAPE ? "Landscape" : "Portrait");
+
+#ifdef __WXMSW__
     bool showHeaderFooter = (wxMessageBox(
         "Show header and footer?",
         "Print with Settings",
         wxYES_NO | wxICON_QUESTION, this) == wxYES);
 
-    wxLogMessage("Printing with paper=%s, orientation=%s, header/footer=%s",
-        paperChoices[sel],
-        printData.GetOrientation() == wxLANDSCAPE ? "Landscape" : "Portrait",
-        showHeaderFooter ? "Yes" : "No");
-
     m_browser->Print(printData, showHeaderFooter);
+#else
+    m_browser->Print(printData);
+#endif
 }
 #endif // wxUSE_PRINTING_ARCHITECTURE
 
