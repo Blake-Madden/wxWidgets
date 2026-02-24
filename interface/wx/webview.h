@@ -1252,8 +1252,8 @@ public:
     virtual void LoadURL(const wxString& url) = 0;
 
     /**
-        Opens a print dialog so that the user may print the currently
-        displayed page.
+        Opens a print dialog (with the backend's default settings) so that the
+        user may print the currently displayed page.
     */
     virtual void Print() = 0;
 
@@ -1271,8 +1271,8 @@ public:
 
         Currently the Edge backend (MSW) has full support for all wxPrintData
         settings including header/footer. The GTK and macOS backends support
-        paper size and orientation but ignore the @a showHeaderFooter parameter.
-        The IE and Chromium backends fall back to Print().
+        paper size, orientation, and copies but ignore the @a showHeaderFooter
+        parameter. The IE and Chromium backends fall back to Print().
 
         @param printData
             The print settings to use.
