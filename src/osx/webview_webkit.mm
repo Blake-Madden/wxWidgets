@@ -479,7 +479,7 @@ void wxWebViewWebKit::Print()
 #include "wx/cmndata.h"
 #include "wx/paper.h"
 
-void wxWebViewWebKit::Print(const wxPrintData& printData, bool WXUNUSED(showHeaderFooter))
+void wxWebViewWebKit::Print(const wxPrintData& printData, int WXUNUSED(flags))
 {
     if ( !m_webView )
         return;

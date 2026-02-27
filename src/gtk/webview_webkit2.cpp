@@ -1473,7 +1473,7 @@ GtkPaperSize* wxWebViewGetGtkPaperSize(wxPaperSize paperId)
 
 } // anonymous namespace
 
-void wxWebViewWebKit::Print(const wxPrintData& printData, bool WXUNUSED(showHeaderFooter))
+void wxWebViewWebKit::Print(const wxPrintData& printData, int WXUNUSED(flags))
 {
     WebKitPrintOperation* printop = webkit_print_operation_new(m_web_view);
 

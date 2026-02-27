@@ -272,7 +272,7 @@ wxString wxWebView::GetPageText() const
 
 #if wxUSE_PRINTING_ARCHITECTURE
 void wxWebView::Print(const wxPrintData& WXUNUSED(printData),
-                      bool WXUNUSED(showHeaderFooter))
+                      int WXUNUSED(flags))
 {
     // Default implementation: fall back to the parameterless Print()
     Print();

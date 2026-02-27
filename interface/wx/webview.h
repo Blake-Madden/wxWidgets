@@ -1261,29 +1261,30 @@ public:
         Prints the currently displayed page using the given print settings.
 
         The @a printData parameter allows specifying paper size, orientation,
-        number of copies, duplex mode and colour/greyscale output. If
-        @a showHeaderFooter is @true, the backend's default header and footer
-        will be printed (the exact content depends on the backend).
+        number of copies, duplex mode and colour/greyscale output.
+
+        The @a flags parameter is a combination of wxWebViewPrintFlags values.
+        By default, headers and footers are shown (where supported by the
+        backend). Pass @c wxWEBVIEW_PRINT_HIDE_HEADER_FOOTER to suppress them.
 
         This overload is only available when @c wxUSE_PRINTING_ARCHITECTURE is
         set to 1. Backends that do not support programmatic print settings
         will fall back to the parameterless Print().
 
         Currently the Edge backend (MSW) has full support for all wxPrintData
-        settings including header/footer. The GTK and macOS backends support
-        paper size, orientation, and copies but ignore the @a showHeaderFooter
-        parameter. The IE and Chromium backends fall back to Print().
+        settings including header/footer control. The GTK and macOS backends
+        support paper size, orientation, and copies but ignore @a flags.
+        The IE and Chromium backends fall back to Print().
 
         @param printData
             The print settings to use.
-        @param showHeaderFooter
-            If @true, display the backend's default header and footer on
-            printed pages. Only supported by the Edge backend.
+        @param flags
+            A combination of wxWebViewPrintFlags values.
 
         @since 3.3.2
     */
     virtual void Print(const wxPrintData& printData,
-                       bool showHeaderFooter = false);
+                       int flags = wxWEBVIEW_PRINT_DEFAULT);
 
     /**
         Registers a custom scheme handler.

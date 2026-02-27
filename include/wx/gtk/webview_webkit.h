@@ -76,7 +76,11 @@ public:
     virtual wxString GetPageText() const override;
     virtual void Print() override;
 #if wxUSE_PRINTING_ARCHITECTURE
-    virtual void Print(const wxPrintData& printData, bool showHeaderFooter = false) override;
+#if wxUSE_WEBVIEW_WEBKIT2
+    virtual void Print(const wxPrintData& printData, int flags = wxWEBVIEW_PRINT_DEFAULT) override;
+#else
+    using wxWebView::Print;
+#endif
 #endif
     virtual bool IsBusy() const override;
 #if wxUSE_WEBVIEW_WEBKIT2

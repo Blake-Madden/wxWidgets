@@ -571,14 +571,6 @@ void wxWebViewIE::Print()
                                  OLECMDEXECOPT_DODEFAULT, nullptr, nullptr);
 }
 
-#if wxUSE_PRINTING_ARCHITECTURE
-void wxWebViewIE::Print(const wxPrintData& WXUNUSED(printData),
-                        bool WXUNUSED(showHeaderFooter))
-{
-    Print();
-}
-#endif
-
 bool wxWebViewIE::CanGoBack() const
 {
     if(m_impl->m_historyEnabled)

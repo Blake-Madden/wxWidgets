@@ -1738,12 +1738,15 @@ void WebFrame::OnPrintWithSettings(wxCommandEvent& WXUNUSED(evt))
         printData.GetOrientation() == wxLANDSCAPE ? "Landscape" : "Portrait");
 
 #ifdef __WXMSW__
-    bool showHeaderFooter = (wxMessageBox(
-        "Show header and footer?",
-        "Print with Settings",
-        wxYES_NO | wxICON_QUESTION, this) == wxYES);
+    int printFlags = wxWEBVIEW_PRINT_DEFAULT;
+    if (wxMessageBox("Hide header and footer?",
+                     "Print with Settings",
+                     wxYES_NO | wxICON_QUESTION, this) == wxYES)
+    {
+        printFlags |= wxWEBVIEW_PRINT_HIDE_HEADER_FOOTER;
+    }
 
-    m_browser->Print(printData, showHeaderFooter);
+    m_browser->Print(printData, printFlags);
 #else
     m_browser->Print(printData);
 #endif

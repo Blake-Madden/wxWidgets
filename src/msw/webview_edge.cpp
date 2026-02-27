@@ -1347,11 +1347,11 @@ void wxWebViewEdge::Print()
 #include "wx/cmndata.h"
 #include "wx/paper.h"
 
-void wxWebViewEdge::Print(const wxPrintData& printData, bool showHeaderFooter)
+void wxWebViewEdge::Print(const wxPrintData& printData, int flags)
 {
     if (!m_impl->m_webView)
     {
-        wxWebView::Print(printData, showHeaderFooter);
+        wxWebView::Print(printData, flags);
         return;
     }
 
@@ -1397,7 +1397,8 @@ void wxWebViewEdge::Print(const wxPrintData& printData, bool showHeaderFooter)
     }
 
     // Set header/footer
-    printSettings->put_ShouldPrintHeaderAndFooter(showHeaderFooter ? TRUE : FALSE);
+    printSettings->put_ShouldPrintHeaderAndFooter(
+        (flags & wxWEBVIEW_PRINT_HIDE_HEADER_FOOTER) ? FALSE : TRUE);
 
     // Try ICoreWebView2PrintSettings2 for extended settings
     wxCOMPtr<ICoreWebView2PrintSettings2> printSettings2;

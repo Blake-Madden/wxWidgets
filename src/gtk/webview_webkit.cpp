@@ -808,14 +808,6 @@ void wxWebViewWebKit::Print()
 
 }
 
-#if wxUSE_PRINTING_ARCHITECTURE
-void wxWebViewWebKit::Print(const wxPrintData& WXUNUSED(printData),
-                            bool WXUNUSED(showHeaderFooter))
-{
-    Print();
-}
-#endif
-
 
 bool wxWebViewWebKit::IsBusy() const
 {

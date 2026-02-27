@@ -1398,14 +1398,6 @@ void wxWebViewChromium::Print()
     host->Print();
 }
 
-#if wxUSE_PRINTING_ARCHITECTURE
-void wxWebViewChromium::Print(const wxPrintData& WXUNUSED(printData),
-                              bool WXUNUSED(showHeaderFooter))
-{
-    Print();
-}
-#endif
-
 void wxWebViewChromium::Cut()
 {
     auto frame = m_clientHandler->GetMainFrame();
