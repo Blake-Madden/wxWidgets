@@ -1098,11 +1098,6 @@ public:
     instead of gradients, providing a modern appearance consistent with
     the Windows Metro / Fluent design language.
 
-    All drawing methods that use gradient fills in wxRibbonMSWArtProvider are
-    overridden to use solid rectangles instead. Colours are still derived
-    from the colour scheme set via SetColourScheme(), and dark mode is
-    supported in the same way as the base class.
-
     @since 3.3.2
 
     @library{wxribbon}
