@@ -172,16 +172,31 @@ enum wxWebViewIE_EmulationLevel
 */
 enum wxWebViewBrowsingDataTypes
 {
-    /** All stored and session cookies */
+    /** All stored and session cookies. */
     wxWEBVIEW_BROWSING_DATA_COOKIES = 0x01,
-    /** Cached data from disk and memory */
+    /** Cached data from disk and memory. */
     wxWEBVIEW_BROWSING_DATA_CACHE = 0x02,
-    /** All DOM Storage: File Systems, Indexed DB, Local Storage, Web SQL, Cache Storage */
+    /** All DOM Storage: File Systems, Indexed DB, Local Storage, Web SQL, Cache Storage. */
     wxWEBVIEW_BROWSING_DATA_DOM_STORAGE = 0x04,
     /** Other browsing data like history, settings, auto fill, passwords, etc. */
     wxWEBVIEW_BROWSING_DATA_OTHER = 0x08,
     /** All browsing data, including data corresponding to all the other constants. */
     wxWEBVIEW_BROWSING_DATA_ALL = 0x0f
+};
+
+/**
+    Types of settings that can be applied to print operations.
+
+    @since 3.3.2
+*/
+enum wxWebViewPrintFlags
+{
+    /** Do not apply any custom settings. */
+    wxWEBVIEW_PRINT_DEFAULT = 0,
+    /** Explicitly prevents headers and footers from appearing in print operations.
+        This currently only applies to the Edge backend;
+        other backends do not provide headers and footers. */
+    wxWEBVIEW_PRINT_HIDE_HEADER_FOOTER = 0x0001
 };
 
 /**
@@ -1284,7 +1299,7 @@ public:
         @since 3.3.2
     */
     virtual void Print(const wxPrintData& printData,
-                       int flags = wxWEBVIEW_PRINT_DEFAULT);
+                       int flags = wxWEBVIEW_PRINT_HIDE_HEADER_FOOTER);
 
     /**
         Registers a custom scheme handler.
