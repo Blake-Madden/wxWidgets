@@ -389,3 +389,32 @@ bool wxMacInitCocoa()
 }
 
 #endif // __WXDARWIN_OSX__
+
+// Move file or directory to macOS Trash using NSFileManager.
+// Called from wxMoveToTrash() in src/common/filefn.cpp.
+bool wxMoveToTrashOSX(const wxString& path)
+{
+    wxCFStringRef cfPath(path);
+    NSURL *fileURL = [NSURL fileURLWithPath:cfPath.AsNSString()];
+    if ( fileURL == nil )
+        return false;
+
+    NSError *error = nil;
+    BOOL ok = [[NSFileManager defaultManager] trashItemAtURL:fileURL
+                                            resultingItemURL:nil
+                                                       error:&error];
+    if ( !ok )
+    {
+        if ( error )
+        {
+            wxLogDebug("NSFileManager trashItemAtURL failed: %s",
+                       wxCFStringRef::AsString([error localizedDescription]));
+        }
+        else
+        {
+            wxLogDebug("NSFileManager trashItemAtURL failed (unknown error)");
+        }
+    }
+
+    return ok;
+}

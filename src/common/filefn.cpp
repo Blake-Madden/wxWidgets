@@ -641,6 +641,160 @@ bool wxRemoveFile(const wxString& file)
     return res == 0;
 }
 
+#if defined(__WXMAC__)
+extern bool wxMoveToTrashOSX(const wxString& path);
+#endif
+
+#if defined(__UNIX__) && !defined(__WXMAC__)
+#include <fcntl.h>
+
+// Percent-encode a file path per RFC 2396 for the FreeDesktop Trash spec.
+static wxString wxTrashUrlEncodePath(const wxString& path)
+{
+    const wxScopedCharBuffer utf8 = path.utf8_str();
+    const char* cur = utf8;
+    wxString result;
+
+    while ( *cur )
+    {
+        const unsigned char ch = static_cast<unsigned char>(*cur);
+        // Unreserved characters per RFC 2396: A-Z a-z 0-9 - _ . ~ /
+        if ( (ch >= 'A' && ch <= 'Z') ||
+             (ch >= 'a' && ch <= 'z') ||
+             (ch >= '0' && ch <= '9') ||
+             ch == '-' || ch == '_' || ch == '.' || ch == '~' || ch == '/' )
+        {
+            result += static_cast<char>(ch);
+        }
+        else
+        {
+            result += wxString::Format("%%%02X", ch);
+        }
+        ++cur;
+    }
+
+    return result;
+}
+#endif // __UNIX__ && !__WXMAC__
+
+bool wxMoveToTrash(const wxString& path)
+{
+    if ( !wxFileExists(path) && !wxDirExists(path) )
+    {
+        wxLogError(_("'%s' doesn't exist and can't be moved to trash"), path);
+        return false;
+    }
+
+#if defined(__WINDOWS__)
+    // SHFileOperation needs double null termination string
+    // but without separator at the end of the path
+    wxString pathStr(path);
+    if ( pathStr.Last() == wxFILE_SEP_PATH )
+        pathStr.RemoveLast();
+    pathStr += wxT('\0');
+
+    SHFILEOPSTRUCT fileop;
+    wxZeroMemory(fileop);
+    fileop.wFunc = FO_DELETE;
+    fileop.pFrom = pathStr.t_str();
+    fileop.fFlags = FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
+
+    int ret = SHFileOperation(&fileop);
+    if ( ret != 0 || fileop.fAnyOperationsAborted )
+    {
+        wxLogDebug(wxS("SHFileOperation(FO_DELETE with FOF_ALLOWUNDO) failed: error 0x%08x"),
+                   ret);
+        return false;
+    }
+
+    return true;
+
+#elif defined(__WXMAC__)
+    return wxMoveToTrashOSX(path);
+
+#elif defined(__UNIX__)
+    wxString xdgData;
+    if ( !wxGetEnv("XDG_DATA_HOME", &xdgData) || xdgData.empty() )
+        xdgData = wxFileName::GetHomeDir() + "/.local/share";
+
+    wxString trashFiles = xdgData + "/Trash/files";
+    wxString trashInfo  = xdgData + "/Trash/info";
+
+    if ( !wxFileName::Mkdir(trashFiles, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL) )
+        return false;
+    if ( !wxFileName::Mkdir(trashInfo, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL) )
+        return false;
+
+    // Resolve the full absolute path
+    wxFileName fileName(path);
+    fileName.MakeAbsolute();
+    wxString fullPath = fileName.GetFullPath();
+
+    // Pick a unique trash name atomically using O_EXCL per the spec
+    wxString baseName = fileName.GetFullName();
+    wxString trashName = baseName;
+    wxString infoPath;
+
+    for ( int attempt = 2; ; ++attempt )
+    {
+        infoPath = trashInfo + "/" + trashName + ".trashinfo";
+
+        int infoFd = open(infoPath.utf8_str(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+        if ( infoFd >= 0 )
+        {
+            close(infoFd);
+            break;
+        }
+        if ( errno != EEXIST )
+        {
+            wxLogSysError(_("'%s' couldn't be moved to trash"), path);
+            return false;
+        }
+
+        // Name collision, try next: "file.2.txt", "file.3.txt", ...
+        wxString name = fileName.GetName();
+        wxString ext  = fileName.GetExt();
+        trashName = wxString::Format("%s.%d", name, attempt);
+        if ( !ext.empty() )
+            trashName += "." + ext;
+    }
+
+    // Write the .trashinfo file
+    {
+        wxFile infoFile;
+        if ( !infoFile.Open(infoPath, wxFile::write) )
+        {
+            wxRemoveFile(infoPath);
+            return false;
+        }
+
+        wxString encodedPath = wxTrashUrlEncodePath(fullPath);
+        wxString info = wxString::Format(
+            "[Trash Info]\nPath=%s\nDeletionDate=%s\n",
+            encodedPath,
+            wxDateTime::Now().FormatISOCombined()
+        );
+        infoFile.Write(info);
+    }
+
+    // Move the file or directory into Trash/files/
+    wxString destPath = trashFiles + "/" + trashName;
+    if ( wxRename(fullPath, destPath) != 0 )
+    {
+        // Move failed (e.g. cross-device) — clean up the .trashinfo
+        wxRemoveFile(infoPath);
+        wxLogSysError(_("'%s' couldn't be moved to trash"), path);
+        return false;
+    }
+
+    return true;
+
+#else
+    wxLogError(_("Moving to trash is not supported on this platform"));
+    return false;
+#endif
+}
+
 bool wxMkdir(const wxString& dir, int perm)
 {
 #if defined(__WXMAC__) && !defined(__UNIX__)
