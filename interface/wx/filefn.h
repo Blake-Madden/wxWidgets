@@ -217,7 +217,7 @@ void wxSplitPath(const wxString& fullname,
 /**
     Returns time of last modification of given file.
 
-    The function returns <tt>(time_t)-1</tt> if an error occurred (e.g. file
+    The function returns <tt>(time_t)-1</tt> if an error occurred (e.g., file
     not found).
 
     @header{wx/filefn.h}
@@ -362,7 +362,7 @@ bool wxRemoveFile(const wxString& file);
     <a href="https://specifications.freedesktop.org/trash/latest/">FreeDesktop
     Trash specification</a> directly.
 
-    @note On Unix, moving files across filesystem boundaries (e.g. from an
+    @note On Unix, moving files across filesystem boundaries (e.g., from an
     external drive) is not supported and will return @false.
 
     @since 3.3.3
