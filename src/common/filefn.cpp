@@ -681,7 +681,7 @@ bool wxMoveToTrash(const wxString& path)
 {
     if ( !wxFileExists(path) && !wxDirExists(path) )
     {
-        wxLogError(_("'%s' doesn't exist and can't be moved to trash"), path);
+        wxLogError(_("'%s' doesn't exist and can't be moved to trash."), path);
         return false;
     }
 
